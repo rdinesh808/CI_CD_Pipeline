@@ -1,52 +1,77 @@
-name: Python Script Execution
+name: GitHub Info & System Details (Ubuntu & Windows)
 
 on:
   push:
     branches:
       - main
   schedule:
-    - cron: "0 12 * * *" # Runs every day at 12 PM UTC
-  workflow_dispatch: # Allows manual execution
+    - cron: "0 12 * * *" # Runs daily at 12 PM UTC
+  workflow_dispatch: # Allows manual trigger
 
 jobs:
-  run-python-script:
-    runs-on: ubuntu-latest
+  fetch-github-info:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+
     steps:
-      - name: Checkout repository
+      - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Get repository details
+      - name: Get GitHub Information
         run: |
           echo "Repository Name: ${{ github.repository }}"
           echo "Build Name: ${{ github.run_id }}"
           echo "Execution Number: ${{ github.run_number }}"
+          echo "Branch Name: ${{ github.ref }}"
+          echo "Commit SHA: ${{ github.sha }}"
+          echo "Triggered By: ${{ github.actor }}"
 
-      - name: Set up Python
+      - name: Get System Details (Ubuntu)
+        if: runner.os == 'Linux'
+        run: |
+          echo "OS Information:"
+          cat /etc/os-release
+          
+          echo "Kernel Version:"
+          uname -r
+          
+          echo "CPU Info:"
+          lscpu
+          
+          echo "Memory Info:"
+          free -h
+          
+          echo "Disk Usage:"
+          df -h
+
+      - name: Get System Details (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          echo "OS Information:"
+          systeminfo | findstr /B /C:"OS Name" /C:"OS Version"
+          
+          echo "CPU Info:"
+          wmic cpu get caption, deviceid, name, numberofcores, maxclockspeed
+          
+          echo "Memory Info:"
+          wmic memorychip get capacity
+          
+          echo "Disk Usage:"
+          wmic logicaldisk get caption, description, filesystem, freespace, size
+
+      - name: Set Up Python (Ubuntu & Windows)
         uses: actions/setup-python@v4
         with:
           python-version: "3.12"
 
-      - name: Get Python version
-        run: python --version
+      - name: Run Python Script
+        run: python script.py # Replace with your script
 
-      - name: Run Python script
-        run: python python_slicing.py # Replace with your script file
-
-  send-notification:
-    needs: run-python-script
+  send_notification:
+    needs: fetch-github-info
     runs-on: ubuntu-latest
     steps:
       - name: Send Email Notification
-        uses: dawidd6/action-send-mail@v3
-        with:
-          server_address: smtp.gmail.com
-          server_port: 587
-          username: ${{ secrets.EMAIL_USERNAME }}
-          password: ${{ secrets.EMAIL_PASSWORD }}
-          subject: "GitHub Actions Execution Completed"
-          body: |
-            Execution Number: ${{ github.run_number }}
-            Repository Name: ${{ github.repository }}
-            Build Name: ${{ github.run_id }}
-          to: "rdinesh808@gmail.com"
-          from: "GitHub Actions"
+        run: echo "GitHub Actions Run Completed" | mail -s "Execution Completed" rdinesh808@gmail.com
