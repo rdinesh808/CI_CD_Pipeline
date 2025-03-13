@@ -48,5 +48,5 @@ jobs:
             Execution Number: ${{ github.run_number }}
             Repository Name: ${{ github.repository }}
             Build Name: ${{ github.run_id }}
-          to: "your-email@example.com"
+          to: "rdinesh808@gmail.com"
           from: "GitHub Actions"
