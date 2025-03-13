@@ -67,7 +67,7 @@ jobs:
           python-version: "3.12"
 
       - name: Run Python Script
-        run: python script.py # Replace with your script
+        run: python python_slicing.py # Replace with your script
 
   send_notification:
     needs: fetch-github-info
