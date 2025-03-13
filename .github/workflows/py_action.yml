@@ -30,7 +30,7 @@ jobs:
         run: python --version
 
       - name: Run Python script
-        run: python script.py # Replace with your script file
+        run: python python_slicing.py # Replace with your script file
 
   send-notification:
     needs: run-python-script
