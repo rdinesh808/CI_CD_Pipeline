@@ -74,4 +74,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Send Email Notification
-        run: echo "GitHub Actions Run Completed" | mail -s "Execution Completed" rdinesh808@gmail.com
+        run: echo "GitHub Actions Run Completed"
+  
+  dinesh:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Dinesh
+        run: echo "Dinesh"
+
